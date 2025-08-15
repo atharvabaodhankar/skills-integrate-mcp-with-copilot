@@ -12,15 +12,19 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: #eaffd0; /* lime green tint */
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 header {
   text-align: center;
   padding: 20px 0;
   margin-bottom: 30px;
-  background-color: #1a237e;
-  color: white;
+  background-color: white;
+  color: #32CD32; /* lime green */
+  border: 2px solid #32CD32;
   border-radius: 5px;
 }
 
@@ -42,7 +46,7 @@ main {
 }
 
 section {
-  background-color: white;
+  background-color: #fff;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -54,7 +58,7 @@ section h3 {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #ddd;
-  color: #1a237e;
+  color: #32CD32;
 }
 
 .activity-card {
@@ -67,7 +71,7 @@ section h3 {
 
 .activity-card h4 {
   margin-bottom: 10px;
-  color: #0066cc;
+  color: #32CD32;
 }
 
 .activity-card p {
@@ -150,7 +154,7 @@ section h3 {
 }
 
 button {
-  background-color: #1a237e;
+  background-color: #32CD32;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -161,7 +165,7 @@ button {
 }
 
 button:hover {
-  background-color: #3949ab;
+  background-color: #a6ffb2;
 }
 
 .message {
@@ -171,15 +175,35 @@ button:hover {
 }
 
 .success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
+  background-color: #eaffd0;
+  color: #32CD32;
+  border: 1px solid #32CD32;
 }
 
 .error {
-  background-color: #ffebee;
+  background-color: #fff0f0;
   color: #c62828;
-  border: 1px solid #ef9a9a;
+  border: 1px solid #c62828;
+/* Animated Git branch lines */
+.git-branches-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+.git-branch-line {
+  stroke: #32CD32;
+  stroke-width: 3;
+  opacity: 0.3;
+  animation: branchMove 8s linear infinite;
+}
+@keyframes branchMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(30px); }
+}
 }
 
 .info {
