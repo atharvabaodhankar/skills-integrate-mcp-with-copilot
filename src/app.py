@@ -85,7 +85,46 @@ def root():
 
 @app.get("/activities")
 def get_activities():
-    return activities
+from fastapi import Query
+
+@app.get("/activities")
+def get_activities(
+    category: str = Query(None, description="Filter by category"),
+    sort: str = Query(None, description="Sort by field: name, spots, participants"),
+    search: str = Query(None, description="Search by activity name or description")
+):
+    # Add category to activities if not present (for demo)
+    category_map = {
+        "Chess Club": "technical",
+        "Programming Class": "technical",
+        "Gym Class": "sports",
+        "Soccer Team": "sports",
+        "Basketball Team": "sports",
+        "Art Club": "non-technical",
+        "Drama Club": "non-technical",
+        "Math Club": "technical",
+        "Debate Team": "non-technical"
+    }
+    filtered = {}
+    for name, details in activities.items():
+        details = details.copy()
+        details["category"] = category_map.get(name, "other")
+        # Filter by category
+        if category and details["category"] != category:
+            continue
+        # Search by name or description
+        if search and search.lower() not in name.lower() and search.lower() not in details["description"].lower():
+            continue
+        filtered[name] = details
+    # Sorting
+    if sort:
+        if sort == "name":
+            filtered = dict(sorted(filtered.items(), key=lambda x: x[0].lower()))
+        elif sort == "spots":
+            filtered = dict(sorted(filtered.items(), key=lambda x: x[1]["max_participants"] - len(x[1]["participants"]), reverse=True))
+        elif sort == "participants":
+            filtered = dict(sorted(filtered.items(), key=lambda x: len(x[1]["participants"]), reverse=True))
+    return filtered
 
 
 @app.post("/activities/{activity_name}/signup")

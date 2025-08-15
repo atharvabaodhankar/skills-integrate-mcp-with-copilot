@@ -3,38 +3,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const categoryFilter = document.getElementById("category-filter");
+  const sortFilter = document.getElementById("sort-filter");
+  const searchFilter = document.getElementById("search-filter");
+  const applyFiltersBtn = document.getElementById("apply-filters");
 
-  // Function to fetch activities from API
+  // Function to fetch activities from API with filters
   async function fetchActivities() {
     try {
-      const response = await fetch("/activities");
+      let url = "/activities";
+      const params = [];
+      if (categoryFilter.value) params.push(`category=${categoryFilter.value}`);
+      if (sortFilter.value) params.push(`sort=${sortFilter.value}`);
+      if (searchFilter.value) params.push(`search=${encodeURIComponent(searchFilter.value)}`);
+      if (params.length) url += `?${params.join("&")}`;
+
+      const response = await fetch(url);
       const activities = await response.json();
 
-      // Clear loading message
       activitiesList.innerHTML = "";
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
-      // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft =
-          details.max_participants - details.participants.length;
+        const spotsLeft = details.max_participants - details.participants.length;
 
-        // Create participants HTML with delete icons instead of bullet points
         const participantsHTML =
           details.participants.length > 0
             ? `<div class="participants-section">
-              <h5>Participants:</h5>
-              <ul class="participants-list">
-                ${details.participants
-                  .map(
-                    (email) =>
-                      `<li><span class="participant-email">${email}</span><button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button></li>`
-                  )
-                  .join("")}
-              </ul>
-            </div>`
+                <h5>Participants:</h5>
+                <ul class="participants-list">
+                  ${details.participants
+                    .map(
+                      (email) =>
+                        `<li><span class="participant-email">${email}</span><button class="delete-btn" data-activity="${name}" data-email="${email}">❌</button></li>`
+                    )
+                    .join("")}
+                </ul>
+              </div>`
             : `<p><em>No participants yet</em></p>`;
 
         activityCard.innerHTML = `
@@ -42,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <p><strong>Category:</strong> ${details.category || "N/A"}</p>
           <div class="participants-container">
             ${participantsHTML}
           </div>
@@ -56,16 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
         activitySelect.appendChild(option);
       });
 
-      // Add event listeners to delete buttons
       document.querySelectorAll(".delete-btn").forEach((button) => {
         button.addEventListener("click", handleUnregister);
       });
     } catch (error) {
-      activitiesList.innerHTML =
-        "<p>Failed to load activities. Please try again later.</p>";
+      activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
     }
   }
+
+  applyFiltersBtn.addEventListener("click", fetchActivities);
+  searchFilter.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") fetchActivities();
+  });
 
   // Handle unregister functionality
   async function handleUnregister(event) {
